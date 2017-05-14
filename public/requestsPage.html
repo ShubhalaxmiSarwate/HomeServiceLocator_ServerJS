@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="serviceLocatorApp">
+<head>
+	<title>Service Locator - Find your desired home services right here.</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no"/>
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<link rel="stylesheet" href="../style/style.css" />
+	<link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/bootstrap-theme.min.css" rel="stylesheet">
+<style>
+		#map: {
+			height: 300px;
+			width: 100%;
+		}
+	#userImg: {
+		height: inherit;
+	}
+	.spImg:{
+		height:100px; 
+		width:auto;
+	}
+	</style>
+</head>
+<div class="container-fluid">
+		<div class="row row-content" ng-controller="BookingRequestController">
+			<div class="col-md-10 col-md-offset-1">
+				<h5>Active Requests as Customer</h5>
+				
+				<div class="table-responsive">
+					<table class="table table-hover">
+						<thead>
+						  <tr>
+							<th>Service Provider</th>
+							<th>Request Time</th>
+							<th>Status</th>
+							<th>Details</th>
+							<th>Action</th>
+						  </tr>
+						</thead>
+						<tbody>
+						  <tr ng-repeat="custReq in custActiveRequests({custid: 1})">
+							<td>{{custReq.spUserid}}</td>
+							<td>{{custReq.reqTime | date}}</td>
+							<td>{{custReq.status}}</td>
+							<td>{{custReq.desc}}</td>
+							<td>
+								<button class="btn btn-danger">Cancel</button>
+								<button class="btn btn-success">Close</button>
+							  </td>						
+						  </tr>
+						</tbody>
+					</table>
+				</div>
+				
+				<hr>
+				
+				<h5>Active Requests as Service Provider</h5>
+				
+				<div class="table-responsive">
+					<table class="table table-hover">
+						<thead>
+						 <tr>
+							<th>Customer</th>
+							<th>Request Time</th>
+							<th>Status</th>
+							<th>Details</th>
+							<th>Action</th>
+						  </tr>
+						</thead>
+						<tbody>
+						  <tr ng-repeat="custReq in custActiveRequests({SPId:1})">
+							<td>{{custReq.spUserid}}</td>
+							<td>{{custReq.reqTime}}</td>
+							<td>{{custReq.status}}</td>
+							<td>{{custReq.desc}}</td>
+							<td>
+								<button class="btn btn-success">Accept</button>
+								<button class="btn btn-danger">Reject</button>
+								<button class="btn btn-primary">Close</button>
+							  </td>						
+						  </tr>
+						</tbody>
+					</table>
+				</div>
+				
+			</div>
+		</div>
+	
+	</div>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+<!--	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-route.js"></script>-->
+   <script src="../scripts/app.js"></script>
+    <script src="../scripts/services.js"></script>
+	<script src="../scripts/controllers.js"></script>
+	<script src="../scripts/angular-ui-router/release/angular-ui-router.min.js"></script>
+    <script src="../scripts/angular-resource/angular-resource.min.js"></script>
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="../js/bootstrap.min.js"></script>

@@ -1,0 +1,174 @@
+	<div class="container-fluid">
+		<div class="row row-content" ng-controller="UserController" >
+			<div class="col-sm-2">
+				<p>Please select a service</p>
+				
+					<select ng-model="serviceTypeSelect">
+					<option value="Transporter">Transporter
+					<option value="Plumber">Plumber
+					<option value="Electrician">Electrician
+					<option value="Gardener">Gardener
+				  </select>
+			
+			</div>
+			<div class="col-sm-10">
+				<div class="row">
+					<div class="col-md-10 col-md-offset-1">
+						<div id="loadingImage"></div>
+						<div id="map"></div>
+<!--
+not using this script <script src="https://maps.googleapis.com/maps/api/geocode/json?address=herrengrabenweg+75,+4054+Basel,+CH&key=AIzaSyA_tXVw0Zp2QIPvnloSV47jscSbRplI_Gs">						</script>
+-->
+												
+
+     // Note: This example requires that you consent to location sharing when
+      // prompted by your browser. If you see the error "The Geolocation service
+      // failed.", it means you probably did not give permission for the browser to
+      // locate you.
+	<script>
+      function initMap() {		 
+		  //the coordinates are currently set for home address.
+        var map = new google.maps.Map(document.getElementById('map'), {
+          center: {lat: 47.5534532, lng: 7.570796000000001},
+          zoom: 15
+        });
+        //var infoWindow = new google.maps.InfoWindow({map: map});
+
+        // Try HTML5 geolocation.
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function(position) {
+            var pos = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+
+            map.setCenter(pos);
+			var marker = new google.maps.Marker({
+				position: pos,
+				map: map
+			});
+          }, function() {
+            handleLocationError(true, infoWindow, map.getCenter());
+          });
+        } else {
+          // Browser doesn't support Geolocation
+          handleLocationError(false, infoWindow, map.getCenter());
+        }
+		  
+		  var geocoder = new google.maps.Geocoder();
+          geocodeAddress(geocoder, map);
+		  
+      }
+
+	function geocodeAddress(geocoder, resultsMap) {
+		var address = 'Wielandplatz 1, 4054 Basel,CH';
+		geocoder.geocode({'address': address}, function (results, status) {
+			if (status === google.maps.GeocoderStatus.OK) {
+				resultsMap.setCenter(results[0].geometry.location);
+				var marker = new google.maps.Marker({
+					map: resultsMap,
+					position: results[0].geometry.location,
+				title: "Wielandplatz 1, 4054 Basel,CH. ★ \u2605 \u2605"
+				});
+				
+			//	infoWindow.setPosition(results[0].geometry.location);
+            //	infoWindow.setContent('https://productforums.google.com/forum/#!topic/maps/XGrvCYVkxBY');
+            //	infoWindow.setContent('Wielandplatz 1, 4054 Basel,CH.');
+			} else {
+				alert('Geocode was not successful for the following reason: ' + status);
+			}
+		});
+	}
+							
+      function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+        infoWindow.setPosition(pos);
+        infoWindow.setContent(browserHasGeolocation ?
+                              'Error: The Geolocation service failed.' :
+                              'Error: Your browser doesn\'t support geolocation.');
+      }
+    </script>
+	<script async defer
+	src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_tXVw0Zp2QIPvnloSV47jscSbRplI_Gs&callback=initMap">
+						</script>
+	
+					</div>
+				</div>
+				<div class="row row-content">
+					<div class="col-md-10 col-md-offset-1">
+						<form>
+						<ul class="media-list">
+					list of service providers: {{serviceTypeSelect}} {{filtText}}								
+							<li class="media" ng-repeat="serviceProvider in serviceProviders | filter: {'serviceProvided':serviceTypeSelect}">
+								<div class="media-left media-middle">									
+									<img class="media-object img-thumbnail spImg" style="height:100px;width:auto;"
+									 ng-src={{serviceProvider.image}} alt={{serviceProvider.userFname}}>	
+								</div>
+								<div class="media-body">
+									<h4 class="media-heading">
+									<!--<a ng-href="#/serviceProvider/{{serviceProvider.id}}">
+											{{serviceProvider.companyName}}
+//										</a>-->
+									</h4>
+									<div><span class="label label-danger">{{serviceProvider.custRating}}★</span></div>
+									 <div class="badge">{{serviceProvider.hourlyRate | currency}}</div>
+									<h4>Contact: {{serviceProvider.userFname}} &nbsp;{{serviceProvider.userLname}}
+											<a class="btn btn-primary" id="booking" class="bookBtn" data-toggle="modal" href="#bookingModal">Book</a> 				
+									</h4>
+									 
+									<p>{{serviceProvider.companyStreetAddress}},<br>
+										{{serviceProvider.companyPostalCode}}&nbsp;{{serviceProvider.companyCity}}<br>
+									</p> 
+									<hr>
+								</div>
+							</li>
+						</ul>
+							</form>
+					</div>
+				</div>
+			</div>
+			
+		</div>
+	
+	</div>
+	<footer>
+		<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="/js/bootstrap.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+<!--	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-route.js"></script>-->
+   <script src="scripts/app.js"></script>
+    <script src="scripts/services.js"></script>
+	<script src="scripts/controllers.js"></script>
+     
+   <script src="scripts/angular-ui-router/release/angular-ui-router.min.js"></script>
+    <script src="scripts/angular-resource/angular-resource.min.js"></script>
+	</footer>
+	<!--<footer>
+		<div>
+			 <button class='detailBtn' onclick="toggleServiceInfo()" title='Service information'>
+				<img src='images/detail.png' alt='detail'/>
+			
+			<button class="addBtn" onclick="addItem()" title="add record">
+				<img src="images/add.png" alt="add">
+			</button>
+			<br>
+			<a class = "infoImg" onclick="toggleAppInfo()">Help</a>
+		</div>
+		<div id='appinfo' class = 'appinfo' style='display: none;'>
+						This application helps you organize your favorite files.</br>
+						Supports all file types, like Audio, Video, Photos, Text etc.</br>
+						Click on Add icon to create a new category for your files. Provide a title and description for the category in the text fields.</br>
+						To add a file to a given category, Click on 'Browse' button to select a file, and 'Upload' button to upload the file.
+						To modify a title or description, Edit the text and press Enter.</br>
+						You can add multiple files (of any type) to a category.</br>
+						Click on <span class = 'deleteBtn' alt='delete'></span> icon to delete the category.
+		</div>
+		<div id="loadingImage"></div>
+		<br><br><br><br><br>
+		<div id="errorDiv" class='errorMsg'></div>
+	</footer>-->
+	<script type="text/javascript" src="/scripts/util.js"></script>
+	<script type="text/javascript" src="/scripts/index.js"></script>
+	
+	<div id="myImage"><div id="innerImg"></div></div>

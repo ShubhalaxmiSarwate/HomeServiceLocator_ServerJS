@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="serviceLocatorApp">
+<head>
+	<title>Service Locator - Find your desired home services right here.</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no"/>
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<link rel="stylesheet" href="/style/style.css" />
+	<link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/bootstrap-theme.min.css" rel="stylesheet">
+<style>
+		#map: {
+			height: 300px;
+			width: 100%;
+		}
+	#userImg: {
+		height: inherit;
+	}
+	.spImg:{
+		height:100px; 
+		width:auto;
+	}
+	</style>
+</head>
+<body>
+
+	
+<!--	the below code for navigation bar and header is moved to header.html to support singlle page app-->
+	<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display-->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      
+		<a class="navbar-brand" href="#">Service Locator</a>
+    </div>
+
+<!--    Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="#">Services <span class="sr-only">(current)</span></a></li>
+        <li><a href="#">About us</a> </li>
+        
+      </ul>
+      
+      <ul class="nav navbar-nav navbar-right">
+        <li><a id="login">Login</a></li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Profile <img src="/images/profile.png" id="userImg" class="img-circle img-thumbnail"  style="height:25px;width:auto;"><span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="#">View Profile</a></li>
+            <li><a href="#">Edit Profile</a></li>
+			<li role="separator" class="divider"></li>
+            <li><a href="#">View Requests</a></li>
+			<li><a href="#">Update Requests</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="#">View Schedule</a></li>
+			<li><a href="#">Update Schudule</a></li>
+            <li role="separator" class="divider"></li>
+			<li><a href="#">View Enquiry</a></li>
+            <li role="separator" class="divider"></li>
+			<li><a href="#">Logout</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse--> 
+  </div><!-- /.container-fluid -->
+</nav>
+	<div id="loginModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Login </h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-inline" role="search">
+                    <div class="form-group">
+                        <input type="email" class="form-control" id="emailid" name="emailid" placeholder="Email">
+                    </div>
+                    <div class="form-group">
+                        <input type="password" class="form-control" id="password" placeholder="Password">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-info">Sign in</button>
+                    <button type="button" class="btn btn-default btn-sm"
+                       data-dismiss="modal">Cancel</button>
+                </form> 
+				<hr>
+				Don't have an account? <a href="/signUp"> Sign up</a>
+            </div>
+        </div>
+        </div>
+    </div> 
+		<div id="bookingModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Booking reqest message </h4>
+            </div>
+            <div class="modal-body">
+                <form class="form">
+                    <div class="form-group">
+						<textarea class="form-control" rows="5" id="custMsg" name="custMsg" placeholder="Message"></textarea>
+                    </div>            
+                    <button type="submit" class="btn btn-info">Book</button>
+                    <button type="button" class="btn btn-default btn-sm"
+                       data-dismiss="modal">Cancel</button>
+                </form> 
+            </div>
+        </div>
+        </div>
+    </div> 
+		<header>
+			<h4>Easy way to a relaxing Lifestyle. Find your desired home services right here!</h4>
+        <!-- Main component for a primary marketing message or call to action -->
+              <!--  <div class="page-header">
+                    <h1 st>Service Locator</h1>
+                    <h4>Easy way to a relaxing Lifestyle. Find your desired home services right here!</h4>
+                </div>--->
+    </header>
+
+
+	  
+	  <!--the below code goes into the home.html to support single page app-->
+	<div class="container-fluid">
+		<div class="row row-content" ng-controller="UserController" >
+			<div class="col-sm-2">
+				<p>Please select a service</p>
+				
+					<select ng-model="serviceTypeSelect">
+					<option value="Transporter">Transporter
+					<option value="Plumber">Plumber
+					<option value="Electrician">Electrician
+					<option value="Gardener">Gardener
+				  </select>
+			
+			</div>
+			<div class="col-sm-10">
+				<div class="row">
+					<div class="col-md-10 col-md-offset-1">
+						<div id="loadingImage"></div>
+						<div id="map"></div>
+<!-- not using this script <script src="https://maps.googleapis.com/maps/api/geocode/json?address=herrengrabenweg+75,+4054+Basel,+CH&key=AIzaSyA_tXVw0Zp2QIPvnloSV47jscSbRplI_Gs">						</script>-->
+												
+
+     <!-- // Note: This example requires that you consent to location sharing when
+      // prompted by your browser. If you see the error "The Geolocation service
+      // failed.", it means you probably did not give permission for the browser to
+      // locate you.-->
+	<script>
+      function initMap() {		 
+		  //the coordinates are currently set for home address.
+        var map = new google.maps.Map(document.getElementById('map'), {
+          center: {lat: 47.5534532, lng: 7.570796000000001},
+          zoom: 15
+        });
+        //var infoWindow = new google.maps.InfoWindow({map: map});
+
+        // Try HTML5 geolocation.
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function(position) {
+            var pos = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+
+           /* infoWindow.setPosition(pos);
+            infoWindow.setContent('Location found.');*/
+            map.setCenter(pos);
+			var marker = new google.maps.Marker({
+				position: pos,
+				map: map
+			});
+          }, function() {
+            handleLocationError(true, infoWindow, map.getCenter());
+          });
+        } else {
+          // Browser doesn't support Geolocation
+          handleLocationError(false, infoWindow, map.getCenter());
+        }
+		  
+		  var geocoder = new google.maps.Geocoder();
+          geocodeAddress(geocoder, map);
+		  
+      }
+
+	function geocodeAddress(geocoder, resultsMap) {
+		var address = 'Wielandplatz 1, 4054 Basel,CH';
+		geocoder.geocode({'address': address}, function (results, status) {
+			if (status === google.maps.GeocoderStatus.OK) {
+				resultsMap.setCenter(results[0].geometry.location);
+				var marker = new google.maps.Marker({
+					map: resultsMap,
+					position: results[0].geometry.location,
+				title: "Wielandplatz 1, 4054 Basel,CH. ★ \u2605 \u2605"
+				});
+				
+			//	infoWindow.setPosition(results[0].geometry.location);
+            //	infoWindow.setContent('https://productforums.google.com/forum/#!topic/maps/XGrvCYVkxBY');
+            //	infoWindow.setContent('Wielandplatz 1, 4054 Basel,CH.');
+			} else {
+				alert('Geocode was not successful for the following reason: ' + status);
+			}
+		});
+	}
+							
+      function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+        infoWindow.setPosition(pos);
+        infoWindow.setContent(browserHasGeolocation ?
+                              'Error: The Geolocation service failed.' :
+                              'Error: Your browser doesn\'t support geolocation.');
+      }
+    </script>
+	<script async defer
+	src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_tXVw0Zp2QIPvnloSV47jscSbRplI_Gs&callback=initMap">
+						</script>
+	
+					</div>
+				</div>
+				<div class="row row-content">
+					<div class="col-md-10 col-md-offset-1">
+						<form>
+						<ul class="media-list">
+					list of service providers: {{serviceTypeSelect}} {{filtText}}								
+							<li class="media" ng-repeat="serviceProvider in serviceProviders | filter: {'serviceProvided':serviceTypeSelect}">
+								<div class="media-left media-middle">									
+									<img class="media-object img-thumbnail spImg" style="height:100px;width:auto;"
+									 ng-src={{serviceProvider.image}} alt={{serviceProvider.userFname}}>	
+								</div>
+								<div class="media-body">
+									<h4 class="media-heading">
+<!--										<a ng-href="#/serviceProvider/{{serviceProvider.id}}">-->
+											{{serviceProvider.companyName}}
+<!--										</a>-->
+									</h4>
+									<div><span class="label label-danger">{{serviceProvider.custRating}}★</span></div>
+									 <div class="badge">{{serviceProvider.hourlyRate | currency}}</div>
+									<h4>Contact: {{serviceProvider.userFname}} &nbsp;{{serviceProvider.userLname}}
+											<a class="btn btn-primary" id="booking" class="bookBtn" data-toggle="modal" href="#bookingModal">Book</a> 				
+									</h4>
+									 <hr>
+									<!--<h5>{{serviceProvider.companyStreetAddress}},<br>
+										{{serviceProvider.companyPostalCode}}&nbsp;{{serviceProvider.companyCity}}<br>
+									</h5> -->                       
+								</div>
+							</li>
+						</ul>
+							</form>
+					</div>
+				</div>
+			</div>
+			
+		</div>
+	
+	</div>
+	
+	<br><br><br>
+<ng-view></ng-view>
+	<!--	<script src="/scripts/angular.min.js"></script>-->
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-route.js"></script>
+   <script src="scripts/app.js"></script>
+    <script src="scripts/controllers.js"></script>
+     <script src="scripts/services.js"></script>
+<!--    <script src="/scripts/angular-ui-router/release/angular-ui-router.min.js"></script>
+    <script src="/scripts/angular-resource/angular-resource.min.js"></script>-->
+	
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="/scripts/util.js"></script>
+	<script type="text/javascript" src="/scripts/index.js"></script>
+	<script>        
+        $('#login').click(function(){
+            $('#loginModal').modal('toggle');
+        });
+		    </script>
+	
+	<script>
+		$('#booking').click(function(){
+            $('#bookingModal').modal('toggle');
+        });
+    </script>
+	
+	<!--<script>
+        var app = angular.module('serviceLocatorApp',[]);
+    </script>
+	<script>
+        var app = angular.module('serviceLocatorApp',[]);
+        app.controller('UserController', ['$scope', function($scope) {
+			$scope.serviceTypeSelect = '';
+			$scope.filtText = '';
+			var serviceProviders = [
+                         {
+							id: '1',
+							userFname: 'Alex',
+							userLname:'Conner',
+							image: '/images/profile.png',
+							streetAddress: 'CentralBahnstrasse 3',
+							city: 'Basel',
+							postalCode: '4051',
+							country: 'Switzerland',
+							emailAddress: 'AC@gmail.com',
+							password: 'Alex',
+							phoneNumber: '+799469874',
+							profileType: 'S',
+							status: 'A',
+							companyName: 'AC Maler AG',
+							companyStreetAddress: 'CentralBahnstrasse 3',
+							companyCity: 'Basel',
+							companyPostalCode: '4051',
+							companyCountry: 'Switzerland',
+							companyPhoneNumber: '+654789321',
+							description: 'The AG company.',
+							hourlyRate: '10.00',
+							availibilityStatus: 'A',
+							custRating: 3,
+							serviceProvided: 'Plumber'
+                        },
+						{
+							id: '2',
+							userFname: 'Simon',
+							userLname:'Puhar',
+							image: '/images/profile.png',
+							streetAddress: 'Claragraben 31',
+							city: 'Basel',
+							postalCode: '4058',
+							country: 'Switzerland',
+							emailAddress: 'SP@gmail.com',
+							password: 'sp',
+							phoneNumber: '+321456987',
+							profileType: 'S',
+							status: 'A',
+							companyName: 'SP Housekeeping',
+							companyStreetAddress: 'Claragraben 31',
+							companyCity: 'Basel',
+							companyPostalCode: '4058',
+							companyCountry: 'Switzerland',
+							companyPhoneNumber: '+321456987',
+							description: 'Complete Housekeeping solution for you',
+							hourlyRate: '15.00',
+							availibilityStatus: 'A',
+							custRating: 4,
+							serviceProvided: 'Gardener'
+                        },
+						{
+							id: '3',
+							userFname: 'Mattew',
+							userLname:'Heree',
+							image: 'images/profile.png',
+							streetAddress: 'Hammerstrasse 177',
+							city: 'Basel',
+							postalCode: '4057',
+							country: 'Switzerland',
+							emailAddress: 'mh@gmail.com',
+							password: 'mh',
+							phoneNumber: '+56321456321',
+							profileType: 'S',
+							status: 'A',
+							companyName: 'Mattew AG',
+							companyStreetAddress: 'Hammerstrasse 177',
+							companyCity: 'Basel',
+							companyPostalCode: '4057',
+							companyCountry: 'Switzerland',
+							companyPhoneNumber: '+654123698',
+							description: 'Electrician helper',
+							hourlyRate: '20.00',
+							availibilityStatus: 'A',
+							custRating: 2.5,
+						   serviceProvided: 'Gardener'
+                        }
+						];
+			$scope.serviceProviders = serviceProviders;
+			
+			$scope.selectOption = function() {
+				alert("setServiceType " + $scope.serviceTypeSelect );
+                var setServiceType = $scope.serviceTypeSelect;
+                
+                if (setServiceType === 2) {
+                    $scope.filtText = "Plumber";
+                }
+                else if (setServiceType === 3) {
+                    $scope.filtText = "Electrician";
+                }
+                else if (setServiceType === 4) {
+                    $scope.filtText = "Gardener";
+                }
+                else {
+                    $scope.filtText = "Transporter";
+                }
+            };
+			
+
+        }]);
+
+    </script>-->
+</body>
+</html>
